@@ -14,6 +14,10 @@ prelink_image () {
 #	echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
 #	echo "LD_PRELOAD=$LD_PRELOAD"
 
+    echo "############## prelink_image1 #########################"
+    echo `ls ${IMAGE_ROOTFS}/etc/ld.so*` 
+    echo `ls ${IMAGE_ROOTFS}/etc/ld.so.conf.d/*` 
+    echo "#######################################################"
 	pre_prelink_size=`du -ks ${IMAGE_ROOTFS} | awk '{size = $1 ; print size }'`
 	echo "Size before prelinking $pre_prelink_size."
 
@@ -61,4 +65,8 @@ prelink_image () {
 
 	pre_prelink_size=`du -ks ${IMAGE_ROOTFS} | awk '{size = $1 ; print size }'`
 	echo "Size after prelinking $pre_prelink_size."
+    echo "############## prelink_image2 #########################"
+    echo `ls ${IMAGE_ROOTFS}/etc/ld.so*` 
+    echo `ls ${IMAGE_ROOTFS}/etc/ld.so.conf.d/*` 
+    echo "#######################################################"
 }

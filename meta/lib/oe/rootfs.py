@@ -11,7 +11,7 @@ import shutil
 import os
 import subprocess
 import re
-
+import glob
 
 class Rootfs(object, metaclass=ABCMeta):
     """
@@ -298,9 +298,22 @@ class Rootfs(object, metaclass=ABCMeta):
 
     def _run_ldconfig(self):
         if self.d.getVar('LDCONFIGDEPEND'):
+            files1 = glob.glob("tmp-glibc/work/ek874-emlinux-linux/core-image-minimal/1.0-r0/rootfs/etc/ld.so*")
+            files2 = glob.glob("tmp-glibc/work/ek874-emlinux-linux/core-image-minimal/1.0-r0/rootfs/etc/ld.so.conf.d/*")
+            bb.note("################# _run_ldconfig (before) ######################")
+            bb.note("etc: " + str(files1))
+            bb.note("etc/ld.so.conf.d: " + str(files2))
+            bb.note("#######################################")
+
             bb.note("Executing: ldconfig -r" + self.image_rootfs + "-c new -v")
             self._exec_shell_cmd(['ldconfig', '-r', self.image_rootfs, '-c',
                                   'new', '-v'])
+            files1 = glob.glob("tmp-glibc/work/ek874-emlinux-linux/core-image-minimal/1.0-r0/rootfs/etc/ld.so*")
+            files2 = glob.glob("tmp-glibc/work/ek874-emlinux-linux/core-image-minimal/1.0-r0/rootfs/etc/ld.so.conf.d/*")
+            bb.note("################# _run_ldconfig (after) ######################")
+            bb.note("etc: " + str(files1))
+            bb.note("etc/ld.so.conf.d: " + str(files2))
+            bb.note("#######################################")
 
     def _check_for_kernel_modules(self, modules_dir):
         for root, dirs, files in os.walk(modules_dir, topdown=True):

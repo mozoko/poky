@@ -5,6 +5,7 @@
 import subprocess
 import multiprocessing
 import traceback
+import glob
 
 def read_file(filename):
     try:
@@ -478,6 +479,14 @@ class ThreadedPool:
 def write_ld_so_conf(d):
     # Some utils like prelink may not have the correct target library paths
     # so write an ld.so.conf to help them
+
+    files1 = glob.glob("tmp-glibc/work/ek874-emlinux-linux/core-image-minimal/1.0-r0/rootfs/etc/ld.so*")
+    files2 = glob.glob("tmp-glibc/work/ek874-emlinux-linux/core-image-minimal/1.0-r0/rootfs/etc/ld.so.conf.d/*")
+    bb.note("################# write_ld_so_conf (before) ######################")
+    bb.note("etc: " + str(files1))
+    bb.note("etc/ld.so.conf.d: " + str(files2))
+    bb.note("#######################################")
+
     ldsoconf = d.expand("${STAGING_DIR_TARGET}${sysconfdir}/ld.so.conf")
     if os.path.exists(ldsoconf):
         bb.utils.remove(ldsoconf)
@@ -485,6 +494,12 @@ def write_ld_so_conf(d):
     with open(ldsoconf, "w") as f:
         f.write(d.getVar("base_libdir") + '\n')
         f.write(d.getVar("libdir") + '\n')
+    files1 = glob.glob("tmp-glibc/work/ek874-emlinux-linux/core-image-minimal/1.0-r0/rootfs/etc/ld.so*")
+    files2 = glob.glob("tmp-glibc/work/ek874-emlinux-linux/core-image-minimal/1.0-r0/rootfs/etc/ld.so.conf.d/*")
+    bb.note("################# write_ld_so_conf (after) ######################")
+    bb.note("etc: " + str(files1))
+    bb.note("etc/ld.so.conf.d: " + str(files2))
+    bb.note("#######################################")
 
 class ImageQAFailed(bb.build.FuncFailed):
     def __init__(self, description, name=None, logfile=None):
