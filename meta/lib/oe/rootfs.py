@@ -179,10 +179,14 @@ class Rootfs(object, metaclass=ABCMeta):
             exec_cmd = cmd
 
         try:
-            subprocess.check_output(exec_cmd, stderr=subprocess.STDOUT)
+            res = subprocess.check_output(exec_cmd, stderr=subprocess.STDOUT)
+            bb.note("### _exec_shell_cmd: " + str(exec_cmd) + "#####")
+            bb.note(str(res))
         except subprocess.CalledProcessError as e:
+            bb.note("### failed  _exec_shell_cmd: " + str(exec_cmd) + "#####")
+            bb.note(str(e.output))
+            bb.note("return code: " + str(e.returncode))
             return("Command '%s' returned %d:\n%s" % (e.cmd, e.returncode, e.output))
-
         return None
 
     def create(self):
