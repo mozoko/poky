@@ -1,0 +1,57 @@
+From 06c2dcba8b9566e9d90f196921c724e195176d1a Mon Sep 17 00:00:00 2001
+From: Tero Kinnunen <tero.kinnunen@vaisala.com>
+Date: Fri, 10 Jul 2020 08:44:32 +0300
+Subject: [PATCH] Fix inappropriate ioctl when detaching tty
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes error
+
+    ERROR: Unable to detach from controlling tty, Inappropriate ioctl for device
+
+when running multiple ptests
+
+    ptest-runner a b
+
+or when invoked over ssh single command, like
+
+    $ ssh localhost ptest-runner
+
+For ssh case, fd 0 is not a tty. (isatty(0) is false).
+When running multiple ptests, deattach for parent needs to be
+done only once.
+
+Signed-off-by: Tero Kinnunen <tero.kinnunen@vaisala.com>
+Signed-off-by: Aníbal Limón <anibal.limon@linaro.org>
+---
+ utils.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/utils.c b/utils.c
+index f11ce39..4983b34 100644
+--- a/utils.c
++++ b/utils.c
+@@ -434,6 +434,9 @@ run_ptests(struct ptest_list *head, const struct ptest_options opts,
+ 			break;
+ 		}
+ 		fprintf(fp, "START: %s\n", progname);
++		if (isatty(0) && ioctl(0, TIOCNOTTY) == -1) {
++			fprintf(fp, "ERROR: Unable to detach from controlling tty, %s\n", strerror(errno));
++		}
+ 		PTEST_LIST_ITERATE_START(head, p);
+ 			char *ptest_dir = strdup(p->run_ptest);
+ 			if (ptest_dir == NULL) {
+@@ -441,9 +444,6 @@ run_ptests(struct ptest_list *head, const struct ptest_options opts,
+ 				break;
+ 			}
+ 			dirname(ptest_dir);
+-			if (ioctl(0, TIOCNOTTY) == -1) {
+-				fprintf(fp, "ERROR: Unable to detach from controlling tty, %s\n", strerror(errno));
+-			}
+ 
+ 			if ((pgid = getpgid(0)) == -1) {
+ 				fprintf(fp, "ERROR: getpgid() failed, %s\n", strerror(errno));
+-- 
+2.17.1
+

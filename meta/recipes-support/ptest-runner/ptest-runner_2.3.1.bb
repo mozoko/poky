@@ -15,6 +15,7 @@ SRC_URI = "git://git.yoctoproject.org/ptest-runner2 \
  file://0002-use-process-groups-when-spawning.patch \
  file://0003-utils-Ensure-pipes-are-read-after-exit.patch \
  file://0004-utils-ensure-child-can-be-session-leader.patch \
+ file://0005-Fix-inappropriate-ioctl-when-detaching-tty.patch \
 "
 
 S = "${WORKDIR}/git"
